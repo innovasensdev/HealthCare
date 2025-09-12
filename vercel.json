@@ -4,10 +4,11 @@
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
+      "config": {
+        "distDir": "build"
+      }
     }
   ],
-  "ignoreCommand": "echo 'Skipping backend files'",
   "framework": "create-react-app",
   "env": {
     "REACT_APP_API_URL": "${REACT_APP_API_URL}"
