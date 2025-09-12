@@ -41,5 +41,9 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:7860"
+  "proxy": "http://localhost:7860",
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  }
 }
