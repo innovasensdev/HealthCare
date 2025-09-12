@@ -4,12 +4,12 @@
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+      "config": { "distDir": "build" }
     }
   ],
   "framework": "create-react-app",
+  "installCommand": "npm ci --legacy-peer-deps",
+  "buildCommand": "CI=false npm run build",
   "env": {
     "REACT_APP_API_URL": "${REACT_APP_API_URL}"
   }
