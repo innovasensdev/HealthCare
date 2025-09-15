@@ -247,12 +247,12 @@ export default function Dashboard() {
     <Box sx={{ flexGrow: 1, p: 2, minHeight: '100vh',
     
       }}>
-      <Grid container spacing={3} sx={{ height: '100vh',justifyContent:"center" }}>
+      <Grid container spacing={3} sx={{ justifyContent:"center" }}>
         {/* Main Content Area - 8 columns */}
         <Grid item xs={12} md={7}>
-          <Grid container spacing={2} sx={{ height: '100%' }}>
+          <Grid container spacing={2} sx={{ height: '90%' }}>
             {/* Call AI Doctor Section - 70vh */}
-            <Grid item xs={12} sx={{ height: '70vh' }}>
+            <Grid item xs={12} sx={{ height: '60vh' }}>
               <NeonCard sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',p:"10px" }}>
                 {!isCallActive ? (
                   <NeonButton
@@ -342,7 +342,7 @@ export default function Dashboard() {
 
         {/* Conversation Panel - 4 columns */}
         <Grid item xs={12} md={3}>
-          <NeonCard sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <NeonCard sx={{ height: '90%%', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ p: 2, borderBottom: '1px solid rgba(0,240,255,0.22)', color: 'rgba(0,240,255)' }}>
               Conversation Log
             </Typography>
