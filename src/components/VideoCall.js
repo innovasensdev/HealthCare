@@ -4,8 +4,9 @@ import {
   Paper,
   IconButton,
   Typography,
-  Tooltip,Button,
+  Tooltip,
   CircularProgress,
+  Button,
 } from '@mui/material';
 import {
   Fullscreen,
@@ -22,7 +23,7 @@ import {
   MicOff,
 } from '@mui/icons-material';
 
-const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
+const VideoCall = ({ stream, isRemote = false, sx, pipecatService, ...props }) => {
   const videoRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -194,27 +195,41 @@ const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
     }
   };
 
-  // Toggle video (camera on/off)
+  // Toggle video (camera on/off) - use PipecatService for local streams
   const toggleVideo = () => {
-    const currentStream = stream || localStream;
-    if (currentStream) {
-      const videoTracks = currentStream.getVideoTracks();
-      videoTracks.forEach(track => {
-        track.enabled = !track.enabled;
-        setIsVideoEnabled(track.enabled);
-      });
+    if (!isRemote && pipecatService) {
+      // Use PipecatService to control the track sent to bot
+      const isVideoMuted = pipecatService.toggleVideo();
+      setIsVideoEnabled(!isVideoMuted);
+    } else {
+      // Fallback for local streams without PipecatService
+      const currentStream = stream || localStream;
+      if (currentStream) {
+        const videoTracks = currentStream.getVideoTracks();
+        videoTracks.forEach(track => {
+          track.enabled = !track.enabled;
+          setIsVideoEnabled(track.enabled);
+        });
+      }
     }
   };
 
-  // Toggle audio (microphone on/off)
+  // Toggle audio (microphone on/off) - use PipecatService for local streams
   const toggleAudio = () => {
-    const currentStream = stream || localStream;
-    if (currentStream) {
-      const audioTracks = currentStream.getAudioTracks();
-      audioTracks.forEach(track => {
-        track.enabled = !track.enabled;
-        setIsMuted(!track.enabled);
-      });
+    if (!isRemote && pipecatService) {
+      // Use PipecatService to control the track sent to bot
+      const isAudioMuted = pipecatService.toggleAudio();
+      setIsMuted(isAudioMuted);
+    } else {
+      // Fallback for local streams without PipecatService
+      const currentStream = stream || localStream;
+      if (currentStream) {
+        const audioTracks = currentStream.getAudioTracks();
+        audioTracks.forEach(track => {
+          track.enabled = !track.enabled;
+          setIsMuted(!track.enabled);
+        });
+      }
     }
   };
 
@@ -319,13 +334,12 @@ const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
             ref={videoRef}
             autoPlay
             playsInline
-            muted={isRemote ? false : isMuted}
+            muted={isRemote ? false : true} // Always mute local video to prevent echo
             style={{
               width: '100%',
               height: '100%',
               objectFit: 'cover',
               position: 'relative',
-              maxHeight:"100vh",
               zIndex: 1,
             }}
           />
@@ -353,8 +367,7 @@ const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
           {renderWaves()}
           
           {/* Control buttons for local camera */}
-          {!isRemote 
-           && (
+          {!isRemote && (
             <Box
               sx={{
                 position: 'absolute',
@@ -371,10 +384,10 @@ const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
                 <IconButton
                   onClick={toggleVideo}
                   sx={{
-                    backgroundColor: isVideoEnabled ? 'rgba(10 ,212, 255, 0.2)' : 'rgba(255, 68, 68, 0.2)',
-                    color: isVideoEnabled ? 'rgb(10, 212, 255)' : '#ff4444',
+                    backgroundColor: isVideoEnabled ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 68, 68, 0.2)',
+                    color: isVideoEnabled ? '#00ff88' : '#ff4444',
                     '&:hover': {
-                      backgroundColor: isVideoEnabled ? 'rgba(10 212 255,0.4)' : 'rgba(255, 68, 68, 0.3)',
+                      backgroundColor: isVideoEnabled ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 68, 68, 0.3)',
                     },
                   }}
                 >
@@ -387,10 +400,10 @@ const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
                 <IconButton
                   onClick={toggleAudio}
                   sx={{
-                    backgroundColor: !isMuted ? 'rgba(10 ,212, 255, 0.2)' : 'rgba(255, 68, 68, 0.2)',
-                    color: !isMuted ? 'rgb(10, 212, 255)' : '#ff4444',
+                    backgroundColor: !isMuted ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 68, 68, 0.2)',
+                    color: !isMuted ? '#00ff88' : '#ff4444',
                     '&:hover': {
-                      backgroundColor: !isMuted ? 'rgba(10 212 255,0.4)' : 'rgba(255, 68, 68, 0.3)',
+                      backgroundColor: !isMuted ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 68, 68, 0.3)',
                     },
                   }}
                 >
@@ -405,7 +418,7 @@ const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          height:  sx?.height || '100%',
+          height: '100%',
           color: '#666'
         }}>
           <Typography variant="body2">
