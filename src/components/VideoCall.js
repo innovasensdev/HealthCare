@@ -16,12 +16,17 @@ import {
   GridOn,
   GridOff,
   FlipCameraIos,
+  Videocam,
+  VideocamOff,
+  Mic,
+  MicOff,
 } from '@mui/icons-material';
 
 const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
   const videoRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [localStream, setLocalStream] = useState(null);
@@ -189,6 +194,30 @@ const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
     }
   };
 
+  // Toggle video (camera on/off)
+  const toggleVideo = () => {
+    const currentStream = stream || localStream;
+    if (currentStream) {
+      const videoTracks = currentStream.getVideoTracks();
+      videoTracks.forEach(track => {
+        track.enabled = !track.enabled;
+        setIsVideoEnabled(track.enabled);
+      });
+    }
+  };
+
+  // Toggle audio (microphone on/off)
+  const toggleAudio = () => {
+    const currentStream = stream || localStream;
+    if (currentStream) {
+      const audioTracks = currentStream.getAudioTracks();
+      audioTracks.forEach(track => {
+        track.enabled = !track.enabled;
+        setIsMuted(!track.enabled);
+      });
+    }
+  };
+
   // Wave animation for speaking detection
   const renderWaves = () => {
     if (!isSpeaking || isRemote) return null;
@@ -296,20 +325,90 @@ const VideoCall = ({ stream, isRemote = false, sx, ...props }) => {
               height: '100%',
               objectFit: 'cover',
               position: 'relative',
+              maxHeight:"100vh",
               zIndex: 1,
             }}
           />
+          
+          {/* Camera disabled overlay */}
+          {!isVideoEnabled && !isRemote && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: '#000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 2,
+              }}
+            >
+              <VideocamOff sx={{ fontSize: 60, color: '#666' }} />
+            </Box>
+          )}
+          
           {renderWaves()}
+          
+          {/* Control buttons for local camera */}
+          {!isRemote 
+           && (
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 10,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                gap: 1,
+                zIndex: 10,
+              }}
+            >
+              {/* Video toggle */}
+              <Tooltip title={isVideoEnabled ? 'Turn off camera' : 'Turn on camera'}>
+                <IconButton
+                  onClick={toggleVideo}
+                  sx={{
+                    backgroundColor: isVideoEnabled ? 'rgba(10 ,212, 255, 0.2)' : 'rgba(255, 68, 68, 0.2)',
+                    color: isVideoEnabled ? 'rgb(10, 212, 255)' : '#ff4444',
+                    '&:hover': {
+                      backgroundColor: isVideoEnabled ? 'rgba(10 212 255,0.4)' : 'rgba(255, 68, 68, 0.3)',
+                    },
+                  }}
+                >
+                  {isVideoEnabled ? <Videocam /> : <VideocamOff />}
+                </IconButton>
+              </Tooltip>
+              
+              {/* Audio toggle */}
+              <Tooltip title={isMuted ? 'Unmute microphone' : 'Mute microphone'}>
+                <IconButton
+                  onClick={toggleAudio}
+                  sx={{
+                    backgroundColor: !isMuted ? 'rgba(10 ,212, 255, 0.2)' : 'rgba(255, 68, 68, 0.2)',
+                    color: !isMuted ? 'rgb(10, 212, 255)' : '#ff4444',
+                    '&:hover': {
+                      backgroundColor: !isMuted ? 'rgba(10 212 255,0.4)' : 'rgba(255, 68, 68, 0.3)',
+                    },
+                  }}
+                >
+                  {isMuted ? <MicOff /> : <Mic />}
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )}
         </>
       ) : (
         <Box sx={{ 
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          height: '100%',
+          height:  sx?.height || '100%',
           color: '#666'
         }}>
-          <Typography variant="body2" sx={{color:"#fff",padding:30}}>
+          <Typography variant="body2">
             {isRemote ? 'Waiting for AI Doctor...' : 'No camera stream'}
           </Typography>
         </Box>

@@ -244,15 +244,15 @@ export default function Dashboard() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, p: 2, minHeight: '100vh',
+    <Box sx={{ flexGrow: 1, p: 2,minHeight: '100vh',display:"flex",alignItems:"center",justifyContent:"center"
     
       }}>
       <Grid container spacing={3} sx={{ justifyContent:"center" }}>
         {/* Main Content Area - 8 columns */}
         <Grid item xs={12} md={7}>
-          <Grid container spacing={2} sx={{ height: '90%' }}>
+          <Grid container spacing={2} sx={{  }}>
             {/* Call AI Doctor Section - 70vh */}
-            <Grid item xs={12} sx={{ height: '60vh' }}>
+            <Grid item xs={12} sx={{ height: '50vh' }}>
               <NeonCard sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',p:"10px" }}>
                 {!isCallActive ? (
                   <NeonButton
@@ -262,7 +262,7 @@ export default function Dashboard() {
                     startIcon={<PlayArrow />}
                     sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
                   >
-                    Call AI Doctor
+                    Start Conversation
                   </NeonButton>
                 ) : (
                   <Box sx={{ textAlign: 'center', width: '100%', height: '100%' }}>
@@ -297,7 +297,7 @@ export default function Dashboard() {
                         ref={remoteVideoRef}
                         stream={remoteStream}
                         isRemote={true}
-                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        sx={{ width: '100%', height: '35vh', objectFit: 'cover' }}
                       />
                     </Box>
                   </Box>
@@ -309,14 +309,16 @@ export default function Dashboard() {
             <Grid item xs={12} sx={{ height: '30vh' }}>
               <Grid container spacing={2} sx={{ height: '100%' }}>
                 {/* Patient Camera */}
+               
                 <Grid item xs={6}>
                   <NeonCard sx={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
+                 
                     <VideoCall
                       ref={localVideoRef}
                       isRemote={false}
                       sx={{ 
                         width: '100%', 
-                        height: '100%', 
+                        height: '30vh', 
                         objectFit: 'cover'
                       }}
                     />
@@ -342,7 +344,7 @@ export default function Dashboard() {
 
         {/* Conversation Panel - 4 columns */}
         <Grid item xs={12} md={3}>
-          <NeonCard sx={{ height: '90%%', display: 'flex', flexDirection: 'column' }}>
+          <NeonCard sx={{  display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ p: 2, borderBottom: '1px solid rgba(0,240,255,0.22)', color: 'rgba(0,240,255)' }}>
               Conversation Log
             </Typography>
@@ -371,9 +373,9 @@ export default function Dashboard() {
               </Box>
             </Box>
             {conversationLogs.length > 0 && 
-            <Box sx={{ flex: 1, overflow: 'auto',height:"80vh", p: 2 }}>
+            <Box sx={{ flex: 1, overflow: 'auto',height:"60vh", p: 2 }}>
               <Stack spacing={2}>
-                {conversationLogs.map((log, index) => (
+                {conversationLogs.slice().reverse().map((log, index) => (
                   <Box
                     key={index}
                     sx={{
