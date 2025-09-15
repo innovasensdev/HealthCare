@@ -252,7 +252,7 @@ export default function Dashboard() {
         <Grid item xs={12} md={7}>
           <Grid container spacing={2} sx={{  }}>
             {/* Call AI Doctor Section - 70vh */}
-            <Grid item xs={12} sx={{ height: '50vh' }}>
+            <Grid item xs={12} sx={{ height: '65vh' }}>
               <NeonCard sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',p:"10px" }}>
                 {!isCallActive ? (
                   <NeonButton
@@ -306,7 +306,7 @@ export default function Dashboard() {
             </Grid>
 
             {/* Bottom Section - 30vh */}
-            <Grid item xs={12} sx={{ height: '30vh' }}>
+            <Grid item xs={12} sx={{ height: '15vh' }}>
               <Grid container spacing={2} sx={{ height: '100%' }}>
                 {/* Patient Camera */}
                
@@ -318,7 +318,7 @@ export default function Dashboard() {
                       isRemote={false}
                       sx={{ 
                         width: '100%', 
-                        height: '30vh', 
+                        height: '22vh', 
                         objectFit: 'cover'
                       }}
                     />
@@ -343,7 +343,7 @@ export default function Dashboard() {
         </Grid>
 
         {/* Conversation Panel - 4 columns */}
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={3} sx={{height:"90vh"}}>
           <NeonCard sx={{  display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ p: 2, borderBottom: '1px solid rgba(0,240,255,0.22)', color: 'rgba(0,240,255)' }}>
               Conversation Log
