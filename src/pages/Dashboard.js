@@ -292,12 +292,12 @@ export default function Dashboard() {
                     </Box>
                     
                     {/* HeyGen Avatar Video - Always show when call is active */}
-                    <Box sx={{ width: '100%', height: 'calc(100% - 80px)', position: 'relative' }}>
+                    <Box sx={{ width: "100vh", height: 'calc(100% - 80px)', position: 'relative' }}>
                       <VideoCall
                         ref={remoteVideoRef}
                         stream={remoteStream}
                         isRemote={true}
-                        sx={{ width: '100%', height: '35vh', objectFit: 'cover' }}
+                        sx={{ width: '100%', height: '52vh', objectFit: 'cover' }}
                       />
                     </Box>
                   </Box>
@@ -346,7 +346,7 @@ export default function Dashboard() {
         <Grid item xs={12} md={3} sx={{height:"90vh"}}>
           <NeonCard sx={{  display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ p: 2, borderBottom: '1px solid rgba(0,240,255,0.22)', color: 'rgba(0,240,255)' }}>
-              Conversation Log
+              Conversation
             </Typography>
              {/* Text Input */}
              <Box sx={{ p: 2, borderTop: '1px solid #333' }}>

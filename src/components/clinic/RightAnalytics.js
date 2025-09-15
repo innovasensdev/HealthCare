@@ -56,8 +56,13 @@ const ServiceCard = ({ icon, title, subtitle, description, onClick, color = '#00
           {icon}
         </Avatar>
         <Box>
-          <Typography  sx={{ color: color, fontWeight: 600, fontSize: '14px' }}>
-            {title}
+          <Typography  sx={{ color: color, fontWeight: 600, fontSize: '14px',mt:1 ,whiteSpace: 'pre-line' }} >
+          {title.split('\n').map((line, index) => (
+    <React.Fragment key={index}>
+      {line}
+      <br />
+    </React.Fragment>
+  ))}
           </Typography>
           {/* {subtitle && (
             <Typography variant="body2" sx={{ color: '#fff', fontSize: '12px' }}>
@@ -98,7 +103,7 @@ export default function RightAnalytics() {
       {/* Home Healthcare */}
       <ServiceCard
         icon={<Home />}
-        title="Healthcare"
+        title="View Your Medical Profile"
         subtitle=""
        
         onClick={() => handleServiceClick('Healthcare')}
@@ -117,8 +122,8 @@ export default function RightAnalytics() {
  {/* Emergency Check-in */}
  <ServiceCard
         icon={<LeakAddIcon />}
-        title="Connect with Us"
-        subtitle="connect "
+        title={"Connect\nwith Us"} // works now
+        subtitle="connect"
        
          onClick={() => handleServiceClick('Connect with Us')}
        color="#05d7ff"
