@@ -14,6 +14,8 @@ class PipecatService {
     this.audioTrack = null;
     this.videoTrack = null;
     this.dataChannel = null;
+    this.isAudioMuted = false;
+    this.isVideoMuted = false;
   }
 
   async startCall() {
@@ -33,33 +35,29 @@ class PipecatService {
           frameRate: { ideal: 30 }
         },
         audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
           sampleRate: { ideal: 16000 },
-          channelCount: { ideal: 1 }
+          channelCount: { ideal: 1 },
+          echoCancellation: true,
+          noiseSuppression: true
         }
       });
 
-      console.log('✅ Got local media stream');
-
-      // Store tracks
-      this.audioTrack = this.localStream.getAudioTracks()[0];
-      this.videoTrack = this.localStream.getVideoTracks()[0];
+      console.log('📹 Got user media:', this.localStream);
 
       // Create WebRTC connection
       this.webrtcConnection = new RTCPeerConnection({
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' }
-        ]
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
       });
 
-      // Add local tracks
+      // Add local tracks to connection
       this.localStream.getTracks().forEach(track => {
         console.log(`📡 Adding ${track.kind} track to WebRTC connection`);
         this.webrtcConnection.addTrack(track, this.localStream);
       });
+
+      // Store audio and video tracks for debugging
+      this.audioTrack = this.localStream.getAudioTracks()[0];
+      this.videoTrack = this.localStream.getVideoTracks()[0];
 
       // Create data channel for conversation messages
       this.dataChannel = this.webrtcConnection.createDataChannel('conversation', {
@@ -134,8 +132,10 @@ class PipecatService {
         
         if (state === 'connected') {
           console.log('✅ WebRTC connection established!');
+          this.isConnected = true;
         } else if (state === 'failed') {
           console.error('❌ WebRTC connection failed');
+          this.isConnected = false;
         }
       };
 
@@ -148,7 +148,7 @@ class PipecatService {
       await this.webrtcConnection.setLocalDescription(offer);
 
       console.log('📤 Sending WebRTC offer to bot.py...');
-
+      
       // Send offer to bot.py
       const response = await axios.post(`${this.baseURL}/api/offer`, {
         sdp: offer.sdp,
@@ -171,6 +171,77 @@ class PipecatService {
       console.error('❌ Failed to start call:', error);
       throw error;
     }
+  }
+
+  // Send text message to bot
+  sendTextMessage(message) {
+    if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+      console.warn('Data channel not ready, queuing message');
+      // Queue the message for when the channel is ready
+      setTimeout(() => this.sendTextMessage(message), 100);
+      return;
+    }
+
+    try {
+      const messageData = {
+        type: 'user-text',
+        text: message,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('📤 Sending text message to bot:', messageData);
+      this.dataChannel.send(JSON.stringify(messageData));
+    } catch (error) {
+      console.error('❌ Failed to send text message:', error);
+    }
+  }
+
+  // Mute/unmute audio track sent to bot
+  toggleAudio() {
+    if (this.audioTrack) {
+      this.audioTrack.enabled = !this.audioTrack.enabled;
+      this.isAudioMuted = !this.audioTrack.enabled;
+      console.log(`🔇 Audio ${this.isAudioMuted ? 'muted' : 'unmuted'} - Bot ${this.isAudioMuted ? 'cannot' : 'can'} hear you`);
+      return this.isAudioMuted;
+    }
+    return false;
+  }
+
+  // Mute/unmute video track sent to bot
+  toggleVideo() {
+    if (this.videoTrack) {
+      this.videoTrack.enabled = !this.videoTrack.enabled;
+      this.isVideoMuted = !this.videoTrack.enabled;
+      console.log(`📹 Video ${this.isVideoMuted ? 'muted' : 'unmuted'}`);
+      return this.isVideoMuted;
+    }
+    return false;
+  }
+
+  // Set audio mute state
+  setAudioMuted(muted) {
+    if (this.audioTrack) {
+      this.audioTrack.enabled = !muted;
+      this.isAudioMuted = muted;
+      console.log(`🔇 Audio ${muted ? 'muted' : 'unmuted'} - Bot ${muted ? 'cannot' : 'can'} hear you`);
+    }
+  }
+
+  // Set video mute state
+  setVideoMuted(muted) {
+    if (this.videoTrack) {
+      this.videoTrack.enabled = !muted;
+      this.isVideoMuted = muted;
+      console.log(`📹 Video ${muted ? 'muted' : 'unmuted'}`);
+    }
+  }
+
+  // Get current mute states
+  getMuteStates() {
+    return {
+      audio: this.isAudioMuted,
+      video: this.isVideoMuted
+    };
   }
 
   async endCall() {
@@ -199,6 +270,8 @@ class PipecatService {
       this.videoTrack = null;
       this.isCallActive = false;
       this.isConnected = false;
+      this.isAudioMuted = false;
+      this.isVideoMuted = false;
       console.log('✅ Call ended successfully');
     } catch (error) {
       console.error('❌ Failed to end call:', error);
@@ -252,34 +325,35 @@ class PipecatService {
         bytesSent: 0,
         packetsSent: 0,
         trackEnabled: false,
-        trackReadyState: 'no-track'
+        trackReadyState: 'disconnected'
       };
     }
 
     try {
-      const stats = await this.webrtcConnection.getStats();
-      const audioStats = {
+      const stats = await this.webrtcConnection.getStats(this.audioTrack);
+      let bytesSent = 0;
+      let packetsSent = 0;
+
+      stats.forEach(report => {
+        if (report.type === 'outbound-rtp' && report.mediaType === 'audio') {
+          bytesSent = report.bytesSent || 0;
+          packetsSent = report.packetsSent || 0;
+        }
+      });
+
+      return {
+        bytesSent,
+        packetsSent,
+        trackEnabled: this.audioTrack.enabled,
+        trackReadyState: this.audioTrack.readyState
+      };
+    } catch (error) {
+      console.error('Failed to get audio stats:', error);
+      return {
         bytesSent: 0,
         packetsSent: 0,
         trackEnabled: this.audioTrack.enabled,
         trackReadyState: this.audioTrack.readyState
-      };
-
-      stats.forEach(report => {
-        if (report.type === 'outbound-rtp' && report.mediaType === 'audio') {
-          audioStats.bytesSent = report.bytesSent || 0;
-          audioStats.packetsSent = report.packetsSent || 0;
-        }
-      });
-
-      return audioStats;
-    } catch (error) {
-      console.warn('Failed to get audio stats:', error);
-      return {
-        bytesSent: 0,
-        packetsSent: 0,
-        trackEnabled: this.audioTrack ? this.audioTrack.enabled : false,
-        trackReadyState: this.audioTrack ? this.audioTrack.readyState : 'error'
       };
     }
   }

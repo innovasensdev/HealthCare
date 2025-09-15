@@ -41,14 +41,16 @@ export default function Login({ onLogin }) {
           <Typography
           sx={{
             fontFamily:"Orbitron, sans-serif",
-            fontSize:"60px"
+            fontSize:"50px",
+            lineHeight:"62px"
           }}
-          >AI-Powered Self symptom Assessment</Typography>
+          >AI-Powered <br/>Self symptom Assessment</Typography>
           <Typography
           sx={{
             fontFamily:"Orbitron, sans-serif",
             fontSize:"22px",
-            letterSpacing:"2px"
+            letterSpacing:"2px",
+            mt:2
           }}
           >
             A clinical-grade AI platform allowing you to perform self-symptom

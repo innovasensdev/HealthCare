@@ -42,7 +42,7 @@ export default function Dashboard() {
 
     // Set up remote stream handler
     service.current.setOnRemoteStream((stream) => {
-      console.log('�� Received remote stream in Dashboard:', stream);
+      console.log('🎥 Received remote stream in Dashboard:', stream);
       setRemoteStream(stream);
       
       // Set up audio playback for remote stream
@@ -117,11 +117,18 @@ export default function Dashboard() {
     // Handle different types of messages from the bot
     if (message.type === 'user-transcription') {
       // User speech was transcribed
-      setConversationLogs(prev => [...prev, {
+      setConversationLogs(prev => [{
         role: 'user',
         text: message.data?.text || message.text || 'User spoke',
         timestamp: new Date().toLocaleTimeString()
-      }]);
+      }, ...prev]);
+    } else if (message.type === 'user-text') {
+      // User sent a text message (echo back)
+      setConversationLogs(prev => [{
+        role: 'user',
+        text: message.data?.text || message.text || 'User sent message',
+        timestamp: new Date().toLocaleTimeString()
+      }, ...prev]);
     } else if (message.type === 'bot-llm-text') {
       // Bot is generating response text - accumulate words into complete message
       const newText = message.data?.text || message.text || '';
@@ -133,12 +140,12 @@ export default function Dashboard() {
           // Check if this looks like a complete sentence or phrase
           if (newText.includes('.') || newText.includes('!') || newText.includes('?') || 
               newText.includes('\n') || message.data?.isComplete) {
-            // Complete message - add to conversation logs
-            setConversationLogs(prevLogs => [...prevLogs, {
+            // Complete message - add to conversation logs at the top
+            setConversationLogs(prevLogs => [{
               role: 'assistant',
               text: updatedMessage.trim(),
               timestamp: new Date().toLocaleTimeString()
-            }]);
+            }, ...prevLogs]);
             return ''; // Reset current message
           } else {
             // Partial message - keep accumulating
@@ -153,11 +160,11 @@ export default function Dashboard() {
       
       // If there's a partial message, complete it
       if (currentAssistantMessage.trim()) {
-        setConversationLogs(prevLogs => [...prevLogs, {
+        setConversationLogs(prevLogs => [{
           role: 'assistant',
           text: currentAssistantMessage.trim(),
           timestamp: new Date().toLocaleTimeString()
-        }]);
+        }, ...prevLogs]);
         setCurrentAssistantMessage('');
       }
     } else if (message.type === 'user-started-speaking') {
@@ -231,8 +238,18 @@ export default function Dashboard() {
   };
 
   const sendMessage = () => {
-    if (input.trim()) {
-      setMessages(prev => [...prev, { role: 'user', text: input, timestamp: new Date().toLocaleTimeString() }]);
+    if (input.trim() && isCallActive) {
+      // Add user message to conversation logs immediately at the top
+      setConversationLogs(prev => [{
+        role: 'user',
+        text: input.trim(),
+        timestamp: new Date().toLocaleTimeString()
+      }, ...prev]);
+      
+      // Send message to bot
+      service.current.sendTextMessage(input.trim());
+      
+      // Clear input
       setInput('');
     }
   };
@@ -279,7 +296,7 @@ export default function Dashboard() {
                       </NeonButton>
                       
                       {/* Audio Toggle */}
-                      <IconButton
+                      {/* <IconButton
                         onClick={toggleAudio}
                         sx={{ 
                           color: isAudioEnabled ? '#00ff88' : '#ff4444',
@@ -288,7 +305,7 @@ export default function Dashboard() {
                         }}
                       >
                         {isAudioEnabled ? <VolumeUp /> : <VolumeOff />}
-                      </IconButton>
+                      </IconButton> */}
                     </Box>
                     
                     {/* HeyGen Avatar Video - Always show when call is active */}
@@ -309,13 +326,13 @@ export default function Dashboard() {
             <Grid item xs={12} sx={{ height: '15vh' }}>
               <Grid container spacing={2} sx={{ height: '100%' }}>
                 {/* Patient Camera */}
-               
                 <Grid item xs={6}>
                   <NeonCard sx={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
                  
                     <VideoCall
                       ref={localVideoRef}
                       isRemote={false}
+                      pipecatService={service.current}
                       sx={{ 
                         width: '100%', 
                         height: '22vh', 
@@ -375,9 +392,8 @@ export default function Dashboard() {
             {conversationLogs.length > 0 && 
             <Box sx={{ flex: 1, overflow: 'auto',height:"60vh", p: 2 }}>
               <Stack spacing={2}>
-                {conversationLogs.slice().reverse().map((log, index) => (
+                {conversationLogs.map((log, index) => (
                   <Box
-                    key={index}
                     sx={{
                       p: 2,
                       borderRadius: 1,

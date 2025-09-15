@@ -384,10 +384,10 @@ const VideoCall = ({ stream, isRemote = false, sx, pipecatService, ...props }) =
                 <IconButton
                   onClick={toggleVideo}
                   sx={{
-                    backgroundColor: isVideoEnabled ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 68, 68, 0.2)',
-                    color: isVideoEnabled ? '#00ff88' : '#ff4444',
+                    backgroundColor: isVideoEnabled ? 'rgba(5 ,215, 255,0.4)' : 'rgba(255, 68, 68, 0.2)',
+                    color: isVideoEnabled ? 'rgb(5, 215, 255)' : '#ff4444',
                     '&:hover': {
-                      backgroundColor: isVideoEnabled ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 68, 68, 0.3)',
+                      backgroundColor: isVideoEnabled ? 'rgba(5 ,215, 255,0.6)' : 'rgba(255, 68, 68, 0.3)',
                     },
                   }}
                 >
@@ -400,10 +400,10 @@ const VideoCall = ({ stream, isRemote = false, sx, pipecatService, ...props }) =
                 <IconButton
                   onClick={toggleAudio}
                   sx={{
-                    backgroundColor: !isMuted ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 68, 68, 0.2)',
-                    color: !isMuted ? '#00ff88' : '#ff4444',
+                    backgroundColor: !isMuted ? 'rgba(5 ,215, 255,0.4)' : 'rgba(255, 68, 68, 0.2)',
+                    color: !isMuted ? 'rgb(5, 215, 255)' : '#ff4444',
                     '&:hover': {
-                      backgroundColor: !isMuted ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 68, 68, 0.3)',
+                      backgroundColor: !isMuted ? 'rgba(5 ,215 ,255,0.6)' : 'rgba(255, 68, 68, 0.3)',
                     },
                   }}
                 >
