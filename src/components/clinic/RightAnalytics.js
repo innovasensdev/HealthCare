@@ -1,70 +1,138 @@
 import React from 'react';
-import { Box, Typography,keyframes } from '@mui/material';
-import MetricDial from '../ui/MetricDial';
+import { 
+  Box, 
+  Typography, 
+  Card, 
+  CardContent, 
+  Button, 
+  IconButton,
+  Chip,
+  Avatar,
+  Stack
+} from '@mui/material';
+import {
+  Home,
+  LocalHospital,
+  // EmergencyRecordingIcon,
+  Person,
+  Phone,
+  Email,
+  LocationOn,
+  AccessTime,
+  CheckCircle,
+  MedicalServices
+} from '@mui/icons-material';
+import LeakAddIcon from '@mui/icons-material/LeakAdd';
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 
-const pulse = keyframes`
-  0% { transform: scaleY(1); }
-  25% { transform: scaleY(0.6); }
-  50% { transform: scaleY(1.2); }
-  75% { transform: scaleY(0.8); }
-  100% { transform: scaleY(1); }
-`;
-function TrendBars() {
-  const values = [8, 12, 7, 14, 10, 16, 12, 18, 9, 15, 11, 19, 8, 14, 12];
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "flex-end",
-        gap: 0.75,
-        height: 120,
-        mb: 2,
-      }}
-    >
-      {values.map((v, i) => (
-        <Box
-          key={i}
+const ServiceCard = ({ icon, title, subtitle, description, onClick, color = '#00F0FF' }) => (
+  <Card
+    sx={{
+      background: 'rgba(0, 0, 0, 0.3)',
+      border: `1px solid ${color}`,
+      borderRadius: 1,
+     
+      cursor: 'pointer',
+      transition: 'all 0.3s ease', // smooth transition for all properties
+      '&:hover': {
+        transform: 'scale(1.05) translateY(-2px)', // scale + move up
+        boxShadow: `0 8px 25px ${color}40`,
+        border: `2px solid ${color}`,
+      },
+    }}
+    onClick={onClick}
+  >
+    <CardContent sx={{ }}>
+      <Box sx={{ display: 'flex', alignItems: 'center',flexDirection:"column",}}>
+        <Avatar
           sx={{
-            width: 8,
-            height: v * 5,
-            borderRadius: 1,
-            background: i % 3 === 0 ? "#39FFB6" : "#00F0FF",
-            boxShadow: `0 0 12px ${i % 3 === 0 ? "#39FFB6" : "#00F0FF"}`,
-            transformOrigin: "bottom",
-            animation: `${pulse} ${0.8 + Math.random()}s infinite ease-in-out`,
-            animationDelay: `${Math.random()}s`,
+            backgroundColor: `${color}20`,
+            color: color,
+         
+            width: 40,
+            height: 40
           }}
-        />
-      ))}
-    </Box>
-  );
-}
-
-function VerticalBars() {
-  const vals = [70, 40, 85, 55];
-  const colors = ['#39FFB6','#00F0FF','#39FFB6','#00F0FF'];
-  return (
-    <Box sx={{ display:'flex', gap: 1.5, mb: 2 }}>
-      {vals.map((v,i)=> (
-        <Box key={i} sx={{ width: 18, height: 120, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow:'hidden' }}>
-          <Box sx={{ width:'100%', height: `${v}%`, background: colors[i], boxShadow:`0 0 16px ${colors[i]}`, transition:'height .3s ease' }} />
+        >
+          {icon}
+        </Avatar>
+        <Box>
+          <Typography  sx={{ color: color, fontWeight: 600, fontSize: '14px' }}>
+            {title}
+          </Typography>
+          {/* {subtitle && (
+            <Typography variant="body2" sx={{ color: '#fff', fontSize: '12px' }}>
+              {subtitle}
+            </Typography>
+          )} */}
         </Box>
-      ))}
-    </Box>
-  );
-}
+      </Box>
+      {description && (
+        <Typography variant="body2" sx={{ color: '#ccc', fontSize: '0.85rem' }}>
+          {description}
+        </Typography>
+      )}
+    </CardContent>
+  </Card>
+);
+
+
 
 export default function RightAnalytics() {
+  const handleServiceClick = (service) => {
+    console.log(`Clicked on ${service}`);
+    // Add navigation logic here
+  };
+
   return (
-    <Box sx={{display:"flex",alignItems:"center",flexDirection:"column",p:2,height:"-webkit-fill-available"}}>
-      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color:'#00F0FF' }}>LOREM IPSUM</Typography>
-      <TrendBars />
-      {/* <VerticalBars /> */}
-      {/* <Box sx={{ display:'flex', gap: 2, mt: 1, flexWrap:'wrap' }}>
-        <MetricDial value={70} label="Health" />
-        <MetricDial value={45} label="Recovery" color="#39FFB6" />
-      </Box> */}
+    <Box sx={{ 
+      display: "grid", 
+      flexDirection: "column", 
+      p: 2, 
+      gap:"20px",
+      height: "100%",
+      overflow: 'auto',
+      gridTemplateColumns: 'repeat(3, 1fr)'
+    }}>
+     
+
+      {/* Home Healthcare */}
+      <ServiceCard
+        icon={<Home />}
+        title="Healthcare"
+        subtitle=""
+       
+        onClick={() => handleServiceClick('Healthcare')}
+        color="#05d7ff"
+      />
+
+      {/* Emergency Check-in */}
+      <ServiceCard
+        icon={<MedicalServicesIcon />}
+        title="Emergency Check-in"
+        subtitle="Check-in"
+       
+        onClick={() => handleServiceClick('Emergency Check-in')}
+       color="#05d7ff"
+      />
+ {/* Emergency Check-in */}
+ <ServiceCard
+        icon={<LeakAddIcon />}
+        title="Connect with Us"
+        subtitle="connect "
+       
+         onClick={() => handleServiceClick('Connect with Us')}
+       color="#05d7ff"
+      />
+
+{/* <ServiceCard
+        icon={<LocalHospital />}
+        title="View Your Medical Profile"
+        subtitle="Medical Profile "
+       
+         onClick={() => handleServiceClick('"Medical Profile')}
+        color="#7C4DFF"
+      /> */}
+
     </Box>
   );
 }
