@@ -371,7 +371,7 @@ export default function Dashboard() {
               </Box>
             </Box>
             {conversationLogs.length > 0 && 
-            <Box sx={{ flex: 1, overflow: 'auto',height:"70vh", p: 2 }}>
+            <Box sx={{ flex: 1, overflow: 'auto',height:"80vh", p: 2 }}>
               <Stack spacing={2}>
                 {conversationLogs.map((log, index) => (
                   <Box
