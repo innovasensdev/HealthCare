@@ -35,7 +35,7 @@ export default function Login({ onLogin }) {
                 color:"white"
           }}>Log in</Button>
         </Stack>
-        <Typography sx={{ mt: 2 }} variant="body2">No account? <Link href="/signup" underline="hover">Sign up</Link></Typography>
+        <Typography sx={{ mt: 2 }} variant="body2">No account? <Link href="#" underline="hover" sx={{color:"#8c8c8c",cursor:"not-allowed"}}>Sign up</Link></Typography>
         </Box>
         <Box sx={{width:"800px"}}>
           <Typography
