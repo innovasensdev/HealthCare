@@ -338,7 +338,7 @@ const VideoCall = ({ stream, isRemote = false, sx, pipecatService, ...props }) =
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: !isRemote ? "contain" : "cover" ,
               position: 'relative',
               zIndex: 1,
             }}

@@ -174,27 +174,49 @@ class PipecatService {
   }
 
   // Send text message to bot
-  sendTextMessage(message) {
-    if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
-      console.warn('Data channel not ready, queuing message');
-      // Queue the message for when the channel is ready
-      setTimeout(() => this.sendTextMessage(message), 100);
-      return;
-    }
+  // sendTextMessage(message) {
+  //   if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+  //     console.warn('Data channel not ready, queuing message');
+  //     // Queue the message for when the channel is ready
+  //     setTimeout(() => this.sendTextMessage(message), 100);
+  //     return;
+  //   }
 
-    try {
-      const messageData = {
-        type: 'user-text',
-        text: message,
-        timestamp: new Date().toISOString()
-      };
+  //   try {
+  //     const messageData = {
+  //       type: 'user-text',
+  //       text: message,
+  //       timestamp: new Date().toISOString()
+  //     };
       
-      console.log('📤 Sending text message to bot:', messageData);
-      this.dataChannel.send(JSON.stringify(messageData));
-    } catch (error) {
-      console.error('❌ Failed to send text message:', error);
-    }
+  //     console.log('📤 Sending text message to bot:', messageData);
+  //     this.dataChannel.send(JSON.stringify(messageData));
+  //   } catch (error) {
+  //     console.error('❌ Failed to send text message:', error);
+  //   }
+  // }
+
+  // Send text message to bot - FIXED to prevent infinite loops
+sendTextMessage(message) {
+  if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+    console.warn('Data channel not ready, dropping message to prevent infinite loops');
+    console.error('❌ Cannot send message - data channel not ready:', message);
+    return; // ✅ DROP MESSAGE instead of infinite retry
   }
+
+  try {
+    const messageData = {
+      type: 'user-text',
+      text: message,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('📤 Sending text message to bot:', messageData);
+    this.dataChannel.send(JSON.stringify(messageData));
+  } catch (error) {
+    console.error('❌ Failed to send text message:', error);
+  }
+}
 
   // Mute/unmute audio track sent to bot
   toggleAudio() {
