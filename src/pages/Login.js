@@ -3,7 +3,7 @@ import { Box, Button, TextField, Typography, Stack, Link } from '@mui/material';
 import NeonCard from '../components/ui/NeonCard';
 import ParticleLayer from '../components/ui/ParticleLayer';
 import Avatar from "../assest/avaratr.png"
-
+import Innovasense from "../assest/innovasense.png"
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,7 +44,7 @@ export default function Login({ onLogin }) {
             fontSize:"50px",
             lineHeight:"62px"
           }}
-          >AI-Powered <br/>Self symptom Assessment</Typography>
+          >Innovasense AI-Powered <br/>Self symptom Assessment</Typography>
           <Typography
           sx={{
             fontFamily:"Orbitron, sans-serif",
@@ -56,6 +56,7 @@ export default function Login({ onLogin }) {
             A clinical-grade AI platform allowing you to perform self-symptom
             assessment as an initial step in diagnosing your condition.
             </Typography>
+            <img src={Innovasense} width="400px" height="auto" style={{position:"absolute",top:40,right:40}}/>
         </Box>
     </Box>
   );

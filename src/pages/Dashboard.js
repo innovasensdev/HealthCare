@@ -24,6 +24,8 @@ export default function Dashboard() {
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState('');
   const [isAssistantSpeaking, setIsAssistantSpeaking] = useState(false);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [currentAssistantBlockId, setCurrentAssistantBlockId] = useState(null);
+  const [userMessageCount, setUserMessageCount] = useState(0);
   
   const service = useRef(new PipecatService());
   const localVideoRef = useRef(null);
@@ -98,7 +100,7 @@ export default function Dashboard() {
       // Monitor audio track
       const audioTracks = stream.getAudioTracks();
       if (audioTracks.length > 0) {
-        console.log('🔊 Remote audio track detected:', audioTracks[0].label);
+        console.log('�� Remote audio track detected:', audioTracks[0].label);
         
         audioTracks[0].addEventListener('ended', () => {
           console.log('🔊 Remote audio track ended');
@@ -110,6 +112,7 @@ export default function Dashboard() {
     }
   };
 
+  
   // Handle conversation updates from the bot
   const handleConversationUpdate = (message) => {
     console.log('🔄 Processing conversation update:', message);
@@ -177,9 +180,6 @@ export default function Dashboard() {
     } else if (message.type === 'bot-tts-started') {
       console.log('🔊 Bot started speaking');
       setIsAssistantSpeaking(true);
-    } else if (message.type === 'bot-tts-finished') {
-      console.log('🔊 Bot finished speaking');
-      setIsAssistantSpeaking(false);
     } else {
       // Handle any other message types
       console.log('📨 Unknown message type:', message.type, message);
@@ -239,8 +239,12 @@ export default function Dashboard() {
 
   const sendMessage = () => {
     if (input.trim() && isCallActive) {
-      // Add user message to conversation logs immediately at the top
+      // Increment user message count
+      setUserMessageCount(prev => prev + 1);
+      
+      // Add user message to conversation logs immediately as separate block
       setConversationLogs(prev => [{
+        id: `user-${Date.now()}-${Math.random()}`,
         role: 'user',
         text: input.trim(),
         timestamp: new Date().toLocaleTimeString()
@@ -272,7 +276,8 @@ export default function Dashboard() {
             <Grid item xs={12} sx={{ height: '65vh' }}>
               <NeonCard sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',p:"10px" }}>
                 {!isCallActive ? (
-                  <NeonButton
+                
+                   <NeonButton
                     onClick={startCall}
                     variant="contained"
                     size="large"
@@ -281,6 +286,8 @@ export default function Dashboard() {
                   >
                     Start Conversation
                   </NeonButton>
+                
+                 
                 ) : (
                   <Box sx={{ textAlign: 'center', width: '100%', height: '100%' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 ,mt:2}}>
