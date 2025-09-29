@@ -7,6 +7,9 @@ dependencies = [
     "aiortc>=1.11.0",
     "pipecat-ai[cartesia,daily,deepgram,elevenlabs,heygen,local-smart-turn-v3,openai,runner,silero,webrtc,whisper]>=0.0.83",
     "pipecatcloud>=0.2.4",
+    "torch",          
+    "tensorflow>=2.0",
+    "flax"  
 ]
 
 [dependency-groups]
